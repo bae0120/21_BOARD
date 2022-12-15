@@ -41,9 +41,6 @@
 		})
 	}
 	
-	
-	
-	
 </script>
 </head>
 <body>
