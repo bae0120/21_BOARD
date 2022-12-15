@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<!-- mybatis.mapper 패키지에 저장된 notice.xml입니다. -->
+<mapper namespace="mybatis.mapper.notice">
+<!-- 
+	<select id="boardList" resultType="hashmap">
+		SELECT 
+			   BOARD_SEQ
+			 , BOARD_TITLE
+			 , BOARD_CONTENT
+		  FROM 
+		  	   BOARD
+	</select>
+ -->	
+	<!-- <select id="boardListCnt" resultType="Integer">
+		SELECT COUNT(BOARD_SEQ)
+		  FROM BOARD
+	</select>
+
+	<select id="boardList" parameterType="Map" resultType="hashmap">
+		SELECT b.ROW_NUM, b.BOARD_SEQ, b.BOARD_TITLE, b.BOARD_CONTENT
+		  FROM (SELECT ROW_NUMBER() OVER(ORDER BY BOARD_SEQ DESC) AS ROW_NUM, BOARD_SEQ, BOARD_TITLE, BOARD_CONTENT
+		          FROM BOARD) b
+		 WHERE b.ROW_NUM BETWEEN #{beginRecord} AND #{endRecord}
+	</select> -->
+	
+	<resultMap type="hashmap" id="noticeList">
+		<result column="NOTICE_SEQ" property="noticeSeq"/>
+		<result column="NOTICE_TITLE" property="noticeTitle"/>
+		<result column="NOTICE_CONTENT" property="noticeContent"/>
+		<result column="NOTICE_CREATED" property="noticeCreated"/>
+		<result column="NOTICE_MODIFIED" property="noticeModified"/>
+		<result column="NOTICE_HIT" property="noticeHit"/>
+	</resultMap>
+	
+	<select id="noticeTotalRecord"  resultType="long">
+			SELECT COUNT(NOTICE_SEQ)
+			  FROM NOTICE
+	
+	</select>
+	<select id="noticeList" parameterType="hashmap" resultMap="noticeList">
+		SELECT N.RN
+		     , N.NOTICE_SEQ
+		     , N.NOTICE_TITLE
+		     , N.NOTICE_CONTENT
+		     , N.NOTICE_CREATED
+		     , N.NOTICE_MODIFIED
+		     , N.NOTICE_HIT
+		 FROM (SELECT 
+		              ROW_NUMBER() OVER(ORDER BY NOTICE_SEQ DESC) AS RN
+		            , NOTICE_SEQ
+		            , NOTICE_TITLE
+		            , NOTICE_CONTENT
+		            , NOTICE_CREATED
+		            , NOTICE_MODIFIED
+		            , NOTICE_HIT
+		         FROM NOTICE) N
+		 WHERE N.RN BETWEEN #{beginRecord} AND #{endRecord}
+	</select>
+	
+	<insert id="addNotict" parameterType="hashmap">
+		INSERT INTO NOTICE(
+		       NOTICE_SEQ
+		     , NOTICE_TITLE
+		     , NOTICE_CONTENT
+		     , NOTICE_CREATED) 
+		VALUES(
+		       NOTICE_SEQ.NEXTVAL
+		       , #{noticeTitle}
+		       , #{noticeContent}
+		       , TO_CHAR(SYSDATE, 'YYYY-MM-DD'))
+	</insert>
+	
+	
+	<select id="detailNotict" parameterType="int" resultMap="noticeList">
+		SELECT NOTICE_SEQ
+             , NOTICE_TITLE
+             , NOTICE_CONTENT
+             , NOTICE_CREATED
+             , NOTICE_MODIFIED
+             , NOTICE_HIT
+         FROM NOTICE
+        WHERE NOTICE_SEQ = #{seqNum}
+	</select>
+	
+	
+	<update id="modifyNotice" parameterType="hashmap">
+		UPDATE NOTICE
+		   SET NOTICE_TITLE = #{noticeTitle}
+		     , NOTICE_CONTENT = #{noticeContent}
+		     , NOTICE_MODIFIED = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+		 WHERE NOTICE_SEQ = #{noticeSeq}
+	</update>
+	
+	
+	<delete id="deleteNotice" parameterType="int">
+		DELETE 
+		  FROM NOTICE
+		 WHERE NOTICE_SEQ = #{seqNum}
+	</delete>
+</mapper>
