@@ -42,7 +42,7 @@
 	}
 	
 </script>
-</head>'
+</head>
 <body>
 	
 	<form id="f">
