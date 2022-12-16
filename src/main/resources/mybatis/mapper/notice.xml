@@ -36,7 +36,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<result column="NOTICE_HIT" property="noticeHit"/>
 	</resultMap>
 	
-	<select id="noticeTotalRecord"  resultType="long">
+	<select id="noticeTotalRecord"  resultType="int">
 			SELECT COUNT(NOTICE_SEQ)
 			  FROM NOTICE
 	
@@ -60,6 +60,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		         FROM NOTICE) N
 		 WHERE N.RN BETWEEN #{beginRecord} AND #{endRecord}
 	</select>
+	<!-- <select id="noticeList" parameterType="com.bsy.ex21.model.PagingVO" resultMap="noticeList">
+		SELECT N.RN
+		     , N.NOTICE_SEQ
+		     , N.NOTICE_TITLE
+		     , N.NOTICE_CONTENT
+		     , N.NOTICE_CREATED
+		     , N.NOTICE_MODIFIED
+		     , N.NOTICE_HIT
+		 FROM (SELECT 
+		              ROW_NUMBER() OVER(ORDER BY NOTICE_SEQ DESC) AS RN
+		            , NOTICE_SEQ
+		            , NOTICE_TITLE
+		            , NOTICE_CONTENT
+		            , NOTICE_CREATED
+		            , NOTICE_MODIFIED
+		            , NOTICE_HIT
+		         FROM NOTICE) N
+		 WHERE N.RN BETWEEN #{start} AND #{end}
+	</select> -->
 	
 	<insert id="addNotict" parameterType="hashmap">
 		INSERT INTO NOTICE(

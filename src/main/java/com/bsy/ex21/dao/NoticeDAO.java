@@ -7,14 +7,16 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.bsy.ex21.model.PagingVO;
+
 @Repository
 public class NoticeDAO {
 	
 	@Autowired
 	private SqlSessionTemplate sqlSessionTemplate;
 	
-	//전체 공지 목록
-	public long noticeTotalRecord() {
+	//전체 공지 개수
+	public int noticeTotalRecord() {
 		return sqlSessionTemplate.selectOne("mybatis.mapper.notice.noticeTotalRecord");
 	}
 	

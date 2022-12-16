@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bsy.ex21.dao.NoticeDAO;
+import com.bsy.ex21.model.PagingVO;
 
 @Service
 public class NoticeServiceImpl implements NoticeService {
@@ -15,7 +16,7 @@ public class NoticeServiceImpl implements NoticeService {
 	private NoticeDAO dao;
 
 	@Override
-	public long noticeTotalRecord() {
+	public int noticeTotalRecord() {
 		// TODO Auto-generated method stub
 		return dao.noticeTotalRecord();
 	}

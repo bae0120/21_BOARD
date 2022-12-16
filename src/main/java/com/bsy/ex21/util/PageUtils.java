@@ -14,7 +14,7 @@ public class PageUtils {
 	   - 전체 페이지는 4페이지가 된다.
 	*****************************************************************************/
 	private long totalRecord;         // DB에서 구해온다.
-	private long recordPerPage = 5;  // 여기서 마음대로 정한다.
+	private long recordPerPage = 10;  // 여기서 마음대로 정한다.
 	private long totalPage;           // totalRecord와 recordPerPage로 계산한다.
 	
 	
@@ -40,15 +40,20 @@ public class PageUtils {
 		block = 2,  6  7  8  9  10  ,  page = 6~10,  beginPage = 6,  endPage = 10
 		block = 3,  11 12           ,  page = 11~15, beginPage = 11, endPage = 12 (endPage = 15가 아님을 주의)
 	*****************************************************************************/
-	private long pagePerBlock = 3;  // 여기서 마음대로 정한다.
+	private long pagePerBlock = 5;  // 여기서 마음대로 정한다.
 	private long beginPage;          // page와 pagePerBlock으로 계산한다.
 	private long endPage;            // beginPage와 pagePerBlock과 totalPage로 계산한다.
 	
+	public PageUtils() {
+	}
 	
+	public PageUtils(long totalRecord, long page) {
+		setPageEntity(totalRecord, page);
+	}
 	// 매개변수 2개
 	// totalRecord : DB에서 가져온다.
 	// page : 파라미터로 가져온다.
-	public void setPageEntity(long totalRecord, int page) {
+	public void setPageEntity(long totalRecord, long page) {
 		
 		// totalRecord, page 필드 값 저장
 		this.totalRecord = totalRecord;

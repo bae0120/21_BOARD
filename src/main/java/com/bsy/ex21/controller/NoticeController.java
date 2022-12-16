@@ -14,7 +14,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import com.bsy.ex21.model.PagingVO;
 import com.bsy.ex21.service.NoticeService;
 import com.bsy.ex21.util.PageUtils;
 
@@ -36,11 +38,10 @@ public class NoticeController {
 		
 		//페이지 파라미터 기본은 1페이지로 잡기
 		Optional<String> opt = Optional.ofNullable(request.getParameter("page"));
-		int page = Integer.parseInt(opt.orElse("1"));
+		long page = Long.parseLong(opt.orElse("1"));
 		
 		//페이징 처리를 위해 사용
-		PageUtils pageUtils = new PageUtils();
-		pageUtils.setPageEntity(total, page);
+		PageUtils pageUtils = new PageUtils(total, page);
 		
 		Map<String, Object> map = new HashMap<>();
 		map.put("beginRecord", pageUtils.getBeginRecord());
@@ -56,12 +57,40 @@ public class NoticeController {
 		//순번표시를 위한 startNo
 		model.addAttribute("startNo", total - (page - 1) * pageUtils.getRecordPerPage());
 		//page이동에따라 페이징 계속 처리하기 위한 getPaging함수
-		model.addAttribute("paging", pageUtils.getPaging(request.getContextPath() + "/notice/noticeList.do"));
-		
+		//model.addAttribute("paging", pageUtils.getPaging(request.getContextPath() + "/notice/noticeList.do"));
+		model.addAttribute("paging", pageUtils);
 		return "notice/list";
 		
 		
 	}
+	
+//	@RequestMapping(value="/notice/noticeList.do", method = RequestMethod.GET)
+//	public String noticeList(Model model, PagingVO vo, @RequestParam(value="nowPage", required=false)String nowPage, @RequestParam(value="cntPerPage", required=false)String cntPerPage) {
+//		
+//		int total = noticeService.noticeTotalRecord();
+//		
+//		if (nowPage == null && cntPerPage == null) {
+//			nowPage = "1";
+//			cntPerPage = "5";
+//		} else if (nowPage == null) {
+//			nowPage = "1";
+//		} else if (cntPerPage == null) { 
+//			cntPerPage = "5";
+//		}
+//		vo = new PagingVO(total, Integer.parseInt(nowPage), Integer.parseInt(cntPerPage));
+//		logger.info(vo.toString());
+//		model.addAttribute("startNo", total - (Integer.parseInt(nowPage) - 1) * vo.setCntPage());
+//		model.addAttribute("paging", vo);
+//		model.addAttribute("noticeList", noticeService.selectNoticeList(vo));
+//		
+//		return "notice/list2";
+//		
+//		
+//	}
+	
+	
+	
+	
 	//공지 작성화면
 	@RequestMapping(value="/notice/btnNoticeWrite.do", method = RequestMethod.GET)
 	public String noticeWrite() {
