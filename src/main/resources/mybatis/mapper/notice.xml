@@ -36,20 +36,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<result column="NOTICE_HIT" property="noticeHit"/>
 	</resultMap>
 	
-	<select id="noticeTotalRecord"  resultType="int">
+	<select id="noticeTotalRecord"  parameterType="hashmap" resultType="long">
 			SELECT COUNT(NOTICE_SEQ)
 			  FROM NOTICE
+			 WHERE 1 = 1
+			   <if test="column != null" >
+			   		AND ${column} LIKE '%' || ${query} || '%'
+			   </if>
 	
 	</select>
 	<select id="noticeList" parameterType="hashmap" resultMap="noticeList">
-		SELECT N.RN
-		     , N.NOTICE_SEQ
-		     , N.NOTICE_TITLE
-		     , N.NOTICE_CONTENT
-		     , N.NOTICE_CREATED
-		     , N.NOTICE_MODIFIED
-		     , N.NOTICE_HIT
-		 FROM (SELECT 
+		SELECT N.NOTICE_SEQ
+     		 , N.NOTICE_TITLE
+    		 , N.NOTICE_CONTENT
+    		 , N.NOTICE_CREATED
+   		     , N.NOTICE_MODIFIED
+   		     , N.NOTICE_HIT
+		  FROM (SELECT 
 		              ROW_NUMBER() OVER(ORDER BY NOTICE_SEQ DESC) AS RN
 		            , NOTICE_SEQ
 		            , NOTICE_TITLE
@@ -57,9 +60,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		            , NOTICE_CREATED
 		            , NOTICE_MODIFIED
 		            , NOTICE_HIT
-		         FROM NOTICE) N
-		 WHERE N.RN BETWEEN #{beginRecord} AND #{endRecord}
+				 FROM NOTICE
+				 WHERE 1 = 1	 
+				   <if test="column != null" >
+				   		AND ${column} LIKE '%' || ${query} || '%'
+				   </if>
+				   ) N
+		WHERE N.RN BETWEEN #{beginRecord} AND #{endRecord}
 	</select>
+	
+	
 	<!-- <select id="noticeList" parameterType="com.bsy.ex21.model.PagingVO" resultMap="noticeList">
 		SELECT N.RN
 		     , N.NOTICE_SEQ
@@ -79,6 +89,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		         FROM NOTICE) N
 		 WHERE N.RN BETWEEN #{start} AND #{end}
 	</select> -->
+
+	
+	
+	
 	
 	<insert id="addNotict" parameterType="hashmap">
 		INSERT INTO NOTICE(
@@ -120,4 +134,61 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		  FROM NOTICE
 		 WHERE NOTICE_SEQ = #{seqNum}
 	</delete>
+	
+	<!-- <select id="selectFindCnt" parameterType="hashmap" resultType="long">
+		SELECT COUNT(N.NOTICE_SEQ)
+		  FROM (SELECT NOTICE_SEQ
+             		 , NOTICE_TITLE
+            		 , NOTICE_CONTENT
+            		 , NOTICE_CREATED
+           		     , NOTICE_MODIFIED
+           		     , NOTICE_HIT
+				 FROM NOTICE
+				WHERE 1 = 1
+				   <choose>
+					   	<when test="column == 'NOTICE_TITLE'" >
+					   		AND NOTICE_TITLE like '%' || #{query} || '%'
+					   	</when>
+					   	<when test="column == 'NOTICE_TITLE_CONTENT'">
+					   		AND (NOTICE_TITLE like '%' || #{query} || '%' OR NOTICE_CONTENT like '%' || #{query} || '%')
+					   	</when>
+				   </choose>	 
+				   
+				   <if test="startDay != '' and endDay != ''">
+				   		AND TO_CHAR(NOTICE_CREATED, 'YYYY-MM-DD') BETWEEN #{startDay} AND #{endDay}
+				   </if>) N
+		
+	</select>
+	
+	<select id="selectFindSearch" parameterType="map" resultMap="noticeList">
+		SELECT N.NOTICE_SEQ
+     		 , N.NOTICE_TITLE
+    		 , N.NOTICE_CONTENT
+    		 , N.NOTICE_CREATED
+   		     , N.NOTICE_MODIFIED
+   		     , N.NOTICE_HIT
+		  FROM (SELECT 
+		              ROW_NUMBER() OVER(ORDER BY NOTICE_SEQ DESC) AS RN
+		            , NOTICE_SEQ
+		            , NOTICE_TITLE
+		            , NOTICE_CONTENT
+		            , NOTICE_CREATED
+		            , NOTICE_MODIFIED
+		            , NOTICE_HIT
+				 FROM NOTICE
+				 WHERE 1 = 1
+				   <choose>
+					   	<when test="column == 'NOTICE_TITLE'" >
+					   		AND NOTICE_TITLE like '%' || #{query} || '%'
+					   	</when>
+					   	<when test="column == 'NOTICE_TITLE_CONTENT'">
+					   		AND (NOTICE_TITLE like '%' || #{query} || '%' OR NOTICE_CONTENT like '%' || #{query} || '%')
+					   	</when>
+				   </choose>	 
+				   
+				   <if test="startDay != '' and endDay != ''">
+				   		AND TO_CHAR(NOTICE_CREATED, 'YYYY-MM-DD') BETWEEN #{startDay} AND #{endDay}
+				   </if>) N
+		WHERE N.RN BETWEEN #{beginRecord} AND #{endRecord}
+	</select> -->
 </mapper>

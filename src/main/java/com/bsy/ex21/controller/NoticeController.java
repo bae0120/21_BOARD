@@ -14,9 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import com.bsy.ex21.model.PagingVO;
 import com.bsy.ex21.service.NoticeService;
 import com.bsy.ex21.util.PageUtils;
 
@@ -29,31 +27,64 @@ public class NoticeController {
 	
 	@RequestMapping("/")
 	public String index() {
-		return "index";
+		return "redirect:/notice/noticeList.do";
 	}
 	//공지 목록
 	@RequestMapping(value="/notice/noticeList.do", method = RequestMethod.GET)
 	public String noticeList(Model model, HttpServletRequest request) {
-		long total = noticeService.noticeTotalRecord();
+
+		//파라미터 저장
+		String column = request.getParameter("column");
+		String query = request.getParameter("query");
+//		String startDay = request.getParameter("startDay");
+//		String endDay = request.getParameter("endDay");
+		
+		//map에 파라미터 저장
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("column", column);
+		map.put("query", query);
+//		map.put("startDay", startDay);
+//		map.put("endDay", endDay); 
+		
+		//전체 데이터 수
+		long total = noticeService.noticeTotalRecord(map);
 		
 		//페이지 파라미터 기본은 1페이지로 잡기
 		Optional<String> opt = Optional.ofNullable(request.getParameter("page"));
 		long page = Long.parseLong(opt.orElse("1"));
+		if(page <= 0) {
+			page = 1;
+		}
+		
+		//일반 조회와 검색 페이징 나누기 위한 패스
+		String path = "";
+		if(request.getParameter("column") != null) {
+			path = request.getContextPath() + "/notice/noticeList.do?column=" + column + "&query=" + query;
+		} else {
+			path = request.getContextPath() + "/notice/noticeList.do";
+		}
 		
 		//페이징 처리를 위해 사용
-		PageUtils pageUtils = new PageUtils(total, page);
+		PageUtils pageUtils = new PageUtils(total, page, path);
 		
-		Map<String, Object> map = new HashMap<>();
+		//전체 페이지 수 출력 시 사용
+		long totalPage = pageUtils.getTotalPage();
+		logger.info(totalPage + "전체 페이지");
+		
+		//map에 페이징을 위한 변수 추가
 		map.put("beginRecord", pageUtils.getBeginRecord());
 		map.put("endRecord", pageUtils.getEndRecord());
 		logger.info(map.toString());
-		
+
+		//리스트에 데이터 가져오기
 		List<Map<String, Object>> noticeList = noticeService.selectNoticeList(map);
 		logger.info(noticeList.toString());
 		logger.info(total + "");
 		
 		//조회된 리스트를 model에 저장해서 jsp로 가져감
 		model.addAttribute("noticeList", noticeList);
+		//전체 게시글 개수
+		model.addAttribute("total", total);
 		//순번표시를 위한 startNo
 		model.addAttribute("startNo", total - (page - 1) * pageUtils.getRecordPerPage());
 		//page이동에따라 페이징 계속 처리하기 위한 getPaging함수
@@ -63,6 +94,25 @@ public class NoticeController {
 		
 		
 	}
+	
+	
+//	//공지 목록
+//	@RequestMapping(value="/notice/noticeList.do", method = RequestMethod.GET)
+//	public String noticeList(Model model, Criteria criteria) {
+//		logger.info("list");
+//		
+//		model.addAttribute("list", noticeService.selectNoticeList(criteria));
+//		
+//		PageMaker pageMaker = new PageMaker();
+//		pageMaker.setCri(criteria);
+//		pageMaker.setTotalCount(noticeService.noticeTotalRecord());
+//		
+//		model.addAttribute("pageMaker", pageMaker);
+//		
+//		return "notice/list3";
+//		
+//		
+//	}
 	
 //	@RequestMapping(value="/notice/noticeList.do", method = RequestMethod.GET)
 //	public String noticeList(Model model, PagingVO vo, @RequestParam(value="nowPage", required=false)String nowPage, @RequestParam(value="cntPerPage", required=false)String cntPerPage) {
@@ -154,4 +204,47 @@ public class NoticeController {
 		model.addAttribute("deleteNotice", res);
 		return "notice/result";
 	}
+	
+	//검색
+//	@RequestMapping(value="/notice/noticeSearch.do", method= RequestMethod.GET)
+//	public String search(HttpServletRequest request, Model model) {
+//		//페이지 파라미터 기본은 1페이지로 잡기
+//		Optional<String> opt = Optional.ofNullable(request.getParameter("page"));
+//		long page = Long.parseLong(opt.orElse("1"));
+//				
+//		String column = request.getParameter("column");
+//		String query = request.getParameter("query");
+//		String startDay = request.getParameter("startDay");
+//		String endDay = request.getParameter("endDay");
+//		
+//		Map<String, Object> map = new HashMap<String, Object>();
+//		map.put("column", column);
+//		map.put("query", query);
+//		map.put("startDay", startDay);
+//		map.put("endDay", endDay); 
+//		
+//		long findCnt = noticeService.selectFindCnt(map);
+//		logger.info(findCnt + "");
+//		//페이징 처리를 위해 사용
+//		PageUtils pageUtils = new PageUtils(findCnt, page);
+//		map.put("beginRecord", pageUtils.getBeginRecord());
+//		map.put("endRecord", pageUtils.getEndRecord());
+//		
+//		logger.info(map.toString());
+//		
+//	    List<Map<String, Object>> list = noticeService.selectFindSearch(map);
+//	    logger.info(list.toString());
+//	    
+//	    model.addAttribute("noticeList", list);
+//		model.addAttribute("paging", pageUtils);
+//		model.addAttribute("column", column);
+//		model.addAttribute("query", query);
+//		model.addAttribute("startDay", startDay);
+//		model.addAttribute("endDay", endDay);
+//		model.addAttribute("startNo", findCnt - (page - 1) * pageUtils.getRecordPerPage());
+//		//page이동에따라 페이징 계속 처리하기 위한 getPaging함수
+//		//model.addAttribute("paging", pageUtils.getPaging(request.getContextPath() + "/notice/noticeList.do"));
+//		
+//		return "notice/list";
+//	}
 }

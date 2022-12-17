@@ -44,11 +44,14 @@ public class PageUtils {
 	private long beginPage;          // page와 pagePerBlock으로 계산한다.
 	private long endPage;            // beginPage와 pagePerBlock과 totalPage로 계산한다.
 	
+	private String path;
+	
 	public PageUtils() {
 	}
 	
-	public PageUtils(long totalRecord, long page) {
+	public PageUtils(long totalRecord, long page, String path) {
 		setPageEntity(totalRecord, page);
+		setPaging(path);
 	}
 	// 매개변수 2개
 	// totalRecord : DB에서 가져온다.
@@ -79,6 +82,14 @@ public class PageUtils {
 		if(endPage > totalPage) {
 			endPage = totalPage;
 		}
+		
+		
+		
+	}
+	
+	public void setPaging(String path) {
+		this.path = path;
+		
 	}
 
 	// ◀◀  prev  1  2  3  4  5  next  ▶▶

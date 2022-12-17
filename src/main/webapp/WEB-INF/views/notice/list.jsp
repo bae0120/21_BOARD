@@ -10,20 +10,37 @@
 <meta charset="UTF-8">
 <title>Insert title here</title>
 <script src="../resources/js/jquery-3.6.0.js"></script>
+<script>
+
+$(function(){
+	$('#column').val('${column}');
+
+	fnSearch(); 
+})
+//검색
+	function fnSearch(){
+		$('#searchForm').on('submit', function(event){
+			if($('#column').val() == '' && $('#query').val() == '' && $('#startDay').val() == '' && $('#endDay').val() == ''){
+				event.preventDefault();				
+			}
+		});
+	}
+</script>
 </head>
 <body>
 
-	<form id="searchForm" action="${contextPath}/notice/noticeSearch.do">
+	<form id="searchForm" action="${contextPath}/notice/noticeList.do">
 		<select name="column" id="column">
 			<option value="">선 택</option>
-			<option value="MEM_NAME">작성자</option>
-			<option value="BOARD_SUBJECT">제 목</option>
-			<option value="BOARD_SUB_CON">제목+내용</option>
+			<option value="NOTICE_TITLE">제목</option>
+			<option value="NOTICE_CONTENT">내용</option>
 		</select>
 		<input type="text" name="query" id="query" value="${query}">
 		<button>검색</button><br>
-		<input type="date" name="startDay" id="startDay" value="${startDay}"> ~ <input type="date" name="endDay" id="endDay" value="${endDay}">
+		<%-- <input type="date" name="startDay" id="startDay" value="${startDay}"> ~ <input type="date" name="endDay" id="endDay" value="${endDay}">--%>
 	</form>
+	
+	총 개시글 : ${total}<br>
 	
 	<input type="button" value="새글작성" onclick="location.href='${contextPath}/notice/btnNoticeWrite.do'">
 	<table border=1>
@@ -59,14 +76,16 @@
 		</tbody>
 		
 	</table>
-	
-	
-	<c:choose>
+
+
+	<%--파라미터가 있으면 (검색 시 페이징)--%>
+	<c:if test="${not empty param.query || not empty param.column}">
+		<c:choose>
 		<c:when test="${paging.page == 1}">
 			prev
 		</c:when>
 		<c:when test="${paging.page != 1}">
-			<a href="${contextPath}/notice/noticeList.do?page=${paging.page-1}">prev</a>
+			<a href="${paging.path}&page=${paging.page-1}">prev</a>
 		</c:when>
 	</c:choose>
 	
@@ -76,7 +95,7 @@
 				<b>${p}</b>
 			</c:when>
 			<c:when test="${p != paging.page}">
-				<a href="${contextPath}/notice/noticeList.do?page=${p}">${p}</a>
+				<a href="${paging.path}&page=${p}">${p}</a>
 			</c:when>
 		</c:choose>
 	</c:forEach>
@@ -86,9 +105,46 @@
 			next
 		</c:when>
 		<c:when test="${paging.page != paging.totalPage}">
-			<a href="${contextPath}/notice/noticeList.do?page=${paging.page+1}">next</a>
+			<a href="${paging.path}&page=${paging.page+1}">next</a>
 		</c:when>
 	</c:choose>
+	</c:if>
+	
+	
+	<%--파라미터가 없으면 (일반 조회시 페이징)--%>
+	<c:if test="${empty param.query || empty param.column}">
+		<c:choose>
+		<c:when test="${paging.page == 1}">
+			prev
+		</c:when>
+		<c:when test="${paging.page != 1}">
+			<a href="${paging.path}?page=${paging.page-1}">prev</a>
+		</c:when>
+		</c:choose>
+		
+		<c:forEach begin="${paging.beginPage}" end="${paging.endPage}" var="p">
+			<c:choose>
+				<c:when test="${p == paging.page}">
+					<b>${p}</b>
+				</c:when>
+				<c:when test="${p != paging.page}">
+					<a href="${paging.path}?page=${p}">${p}</a>
+				</c:when>
+			</c:choose>
+		</c:forEach>
+		
+		<c:choose>
+			<c:when test="${paging.page == paging.totalPage}">
+				next
+			</c:when>
+			<c:when test="${paging.page != paging.totalPage}">
+				<a href="${paging.path}?page=${paging.page+1}">next</a>
+			</c:when>
+		</c:choose>
+	</c:if>
+	
+	
+	
 	
 </body>
 </html>
