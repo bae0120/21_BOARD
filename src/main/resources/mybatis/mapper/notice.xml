@@ -40,9 +40,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			SELECT COUNT(NOTICE_SEQ)
 			  FROM NOTICE
 			 WHERE 1 = 1
-			   <if test="column != null" >
-			   		AND ${column} LIKE '%' || ${query} || '%'
-			   </if>
+		   <choose>
+			   	<when test="column == 'NOTICE_TITLE'" >
+			   		AND NOTICE_TITLE like '%' || #{query} || '%'
+			   	</when>
+			   	<when test="column == 'NOTICE_CONTENT'">
+			   		AND NOTICE_CONTENT like '%' || #{query} || '%'
+			   	</when>
+		   </choose>	 
 	
 	</select>
 	<select id="noticeList" parameterType="hashmap" resultMap="noticeList">
@@ -61,13 +66,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		            , NOTICE_MODIFIED
 		            , NOTICE_HIT
 				 FROM NOTICE
-				 WHERE 1 = 1	 
-				   <if test="column != null" >
-				   		AND ${column} LIKE '%' || ${query} || '%'
-				   </if>
+				 WHERE 1 = 1
+				   <choose>
+					   	<when test="column == 'NOTICE_TITLE'" >
+					   		AND NOTICE_TITLE like '%' || #{query} || '%'
+					   	</when>
+					   	<when test="column == 'NOTICE_CONTENT'">
+					   		AND NOTICE_CONTENT like '%' || #{query} || '%'
+					   	</when>
+				   </choose>	 
+				   
 				   ) N
 		WHERE N.RN BETWEEN #{beginRecord} AND #{endRecord}
 	</select>
+	
 	
 	
 	<!-- <select id="noticeList" parameterType="com.bsy.ex21.model.PagingVO" resultMap="noticeList">

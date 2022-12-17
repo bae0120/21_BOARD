@@ -10,31 +10,33 @@
 <meta charset="UTF-8">
 <title>Insert title here</title>
 <script src="../resources/js/jquery-3.6.0.js"></script>
+
 <script>
 
-$(function(){
-	$('#column').val('${column}');
-
-	fnSearch(); 
-})
+	$(function(){
+		fnSearch();
+	})
 //검색
 	function fnSearch(){
 		$('#searchForm').on('submit', function(event){
-			if($('#column').val() == '' && $('#query').val() == '' && $('#startDay').val() == '' && $('#endDay').val() == ''){
-				event.preventDefault();				
+			if($('#column').val() == '' || $('#query').val() == '' ){
+				alert('검색 내용을 입력해주세요.');
+				event.preventDefault();
+				return;
 			}
 		});
 	}
 </script>
 </head>
 <body>
-
+	
 	<form id="searchForm" action="${contextPath}/notice/noticeList.do">
 		<select name="column" id="column">
-			<option value="">선 택</option>
-			<option value="NOTICE_TITLE">제목</option>
-			<option value="NOTICE_CONTENT">내용</option>
+		  <option value="" >선택</option>
+		  <option value="NOTICE_TITLE" >제목</option>
+		  <option value='NOTICE_CONTENT'>내용</option>
 		</select>
+		
 		<input type="text" name="query" id="query" value="${query}">
 		<button>검색</button><br>
 		<%-- <input type="date" name="startDay" id="startDay" value="${startDay}"> ~ <input type="date" name="endDay" id="endDay" value="${endDay}">--%>
@@ -79,7 +81,7 @@ $(function(){
 
 
 	<%--파라미터가 있으면 (검색 시 페이징)--%>
-	<c:if test="${not empty param.query || not empty param.column}">
+	<c:if test="${not empty param.query && not empty param.column}">
 		<c:choose>
 		<c:when test="${paging.page == 1}">
 			prev
@@ -112,7 +114,7 @@ $(function(){
 	
 	
 	<%--파라미터가 없으면 (일반 조회시 페이징)--%>
-	<c:if test="${empty param.query || empty param.column}">
+	<c:if test="${empty param.query && empty param.column}">
 		<c:choose>
 		<c:when test="${paging.page == 1}">
 			prev
@@ -142,9 +144,6 @@ $(function(){
 			</c:when>
 		</c:choose>
 	</c:if>
-	
-	
-	
-	
+
 </body>
 </html>

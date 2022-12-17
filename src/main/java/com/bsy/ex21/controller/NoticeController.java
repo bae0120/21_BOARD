@@ -12,8 +12,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.bsy.ex21.service.NoticeService;
 import com.bsy.ex21.util.PageUtils;
@@ -146,9 +149,26 @@ public class NoticeController {
 	public String noticeWrite() {
 		return "notice/write";
 	}
-	//공지작성
+	
+//	//공지작성 1
+//	@RequestMapping(value="/notice/addNotice.do", method = RequestMethod.POST)
+//	public String addNotice(HttpServletRequest request, Model model) {
+//		Map<String, Object> map = new HashMap<>();
+//		String noticeTitle = (String) request.getParameter("noticeTitle");
+//		String noticeContent = (String) request.getParameter("noticeContent");
+//		
+//		map.put("noticeTitle", noticeTitle);
+//		map.put("noticeContent", noticeContent);
+//		logger.info(map.toString());
+//		
+//		int res = noticeService.addNotice(map);
+//		model.addAttribute("addNotice", res);
+//		return "notice/result";
+//	}
+	
+	//공지작성 2
 	@RequestMapping(value="/notice/addNotice.do", method = RequestMethod.POST)
-	public String addNotice(HttpServletRequest request, Model model) {
+	public String addNotice(HttpServletRequest request, RedirectAttributes ra) {
 		Map<String, Object> map = new HashMap<>();
 		String noticeTitle = (String) request.getParameter("noticeTitle");
 		String noticeContent = (String) request.getParameter("noticeContent");
@@ -158,10 +178,19 @@ public class NoticeController {
 		logger.info(map.toString());
 		
 		int res = noticeService.addNotice(map);
-		model.addAttribute("addNotice", res);
-		return "notice/result";
+        ra.addFlashAttribute("addNotice",res);
+		
+		return "redirect:/notice/result.do"; // alert 후, 전달된 url 파라미터로 이동시키는 페이지
 	}
 	
+	@RequestMapping(value="/notice/result.do", method = RequestMethod.GET)
+	public String result() {
+		return "notice/result";
+	}
+
+	
+		
+		
 	
 	//공지 상세
 	@RequestMapping(value="/notice/detail.do", method = RequestMethod.GET)
